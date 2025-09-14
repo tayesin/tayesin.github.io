@@ -9,7 +9,7 @@
         .gallery { display: flex; flex-wrap: wrap; gap: 2em; }
         .img-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1em; width: 320px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);}
         .img-card img { max-width: 100%; border-radius: 4px; }
-        .displacement { font-size: 0.95em; color: #555; margin-top: 0.5em; }
+        .filename { font-size: 1em; color: #555; margin-top: 0.5em; }
     </style>
 </head>
 <body>
@@ -17,122 +17,69 @@
     <section>
         <h2>Overview</h2>
         <p>
-            <!-- Write your overview here. Example: -->
             This project implements automatic alignment of color channels from historical images using normalized cross-correlation and multi-scale pyramid search. The results are shown below.
         </p>
     </section>
     <section>
-        <h2>Gallery</h2>
+        <h2>Gallery (media/)</h2>
         <div class="gallery">
             <div class="img-card">
-                <img src="../imgout/cathedral.jpg" alt="cathedral.jpg">
-                <div class="displacement">
-                    cathedral.jpg:<br>
-                    R: (10, 3)<br>
-                    G: (5, 2)
-                </div>
+                <img src="../media/cathedral.jpg" alt="cathedral.jpg">
+                <div class="filename">cathedral.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/church.tif" alt="church.tif">
-                <div class="displacement">
-                    church.tif:<br>
-                    R: (59, -4)<br>
-                    G: (25, 4)
-                </div>
+                <img src="../media/church.jpg" alt="church.jpg">
+                <div class="filename">church.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/emir.tif" alt="emir.tif">
-                <div class="displacement">
-                    emir.tif:<br>
-                    R: (105, 42)<br>
-                    G: (50, 23)
-                </div>
+                <img src="../media/emir.jpg" alt="emir.jpg">
+                <div class="filename">emir.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/harvesters.tif" alt="harvesters.tif">
-                <div class="displacement">
-                    harvesters.tif:<br>
-                    R: (123, 13)<br>
-                    G: (59, 17)
-                </div>
+                <img src="../media/harvesters.jpg" alt="harvesters.jpg">
+                <div class="filename">harvesters.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/icon.tif" alt="icon.tif">
-                <div class="displacement">
-                    icon.tif:<br>
-                    R: (89, 23)<br>
-                    G: (40, 18)
-                </div>
+                <img src="../media/icon.jpg" alt="icon.jpg">
+                <div class="filename">icon.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/italil.tif" alt="italil.tif">
-                <div class="displacement">
-                    italil.tif:<br>
-                    R: (77, 35)<br>
-                    G: (38, 21)
-                </div>
+                <img src="../media/italil.jpg" alt="italil.jpg">
+                <div class="filename">italil.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/lastochikino.tif" alt="lastochikino.tif">
-                <div class="displacement">
-                    lastochikino.tif:<br>
-                    R: (76, -9)<br>
-                    G: (-3, -2)
-                </div>
+                <img src="../media/lastochikino.jpg" alt="lastochikino.jpg">
+                <div class="filename">lastochikino.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/lugano.tif" alt="lugano.tif">
-                <div class="displacement">
-                    lugano.tif:<br>
-                    R: (93, -29)<br>
-                    G: (41, -16)
-                </div>
+                <img src="../media/lugano.jpg" alt="lugano.jpg">
+                <div class="filename">lugano.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/melons.tif" alt="melons.tif">
-                <div class="displacement">
-                    melons.tif:<br>
-                    R: (180, 12)<br>
-                    G: (85, 11)
-                </div>
+                <img src="../media/melons.jpg" alt="melons.jpg">
+                <div class="filename">melons.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/monastery.jpg" alt="monastery.jpg">
-                <div class="displacement">
-                    monastery.jpg:<br>
-                    R: (3, 2)<br>
-                    G: (-3, 2)
-                </div>
+                <img src="../media/monastery.jpg" alt="monastery.jpg">
+                <div class="filename">monastery.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/self_portrait.tif" alt="self_portrait.tif">
-                <div class="displacement">
-                    self_portrait.tif:<br>
-                    R: (179, 38)<br>
-                    G: (81, 30)
-                </div>
+                <img src="../media/self_portrait.jpg" alt="self_portrait.jpg">
+                <div class="filename">self_portrait.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/siren.tif" alt="siren.tif">
-                <div class="displacement">
-                    siren.tif:<br>
-                    R: (96, -25)<br>
-                    G: (50, -6)
-                </div>
+                <img src="../media/siren.jpg" alt="siren.jpg">
+                <div class="filename">siren.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/three_generations.tif" alt="three_generations.tif">
-                <div class="displacement">
-                    three_generations.tif:<br>
-                    R: (113, 10)<br>
-                    G: (55, 14)
-                </div>
+                <img src="../media/three_generations.jpg" alt="three_generations.jpg">
+                <div class="filename">three_generations.jpg</div>
             </div>
             <div class="img-card">
-                <img src="../imgout/tobolsk.jpg" alt="tobolsk.jpg">
-                <div class="displacement">
-                    tobolsk.jpg:<br>
-                    R: (7, 3)<br>
-                    G: (3, 3)
-                </div>
+                <img src="../media/tobolsk.jpg" alt="tobolsk.jpg">
+                <div class="filename">tobolsk.jpg</div>
             </div>
+        </div>
+    </section>
+</body>
+</html>
