@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS180 Project 1: Image Alignment</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; }
+        h1, h2 { color: #333; }
+        .gallery { display: flex; flex-wrap: wrap; gap: 2em; }
+        .img-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1em; width: 320px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);}
+        .img-card img { max-width: 100%; border-radius: 4px; }
+        .displacement { font-size: 0.95em; color: #555; margin-top: 0.5em; }
+    </style>
+</head>
+<body>
+    <h1>CS180 Project 1: Image Alignment</h1>
+    <section>
+        <h2>Overview</h2>
+        <p>
+            <!-- Write your overview here. Example: -->
+            This project implements automatic alignment of color channels from historical images using normalized cross-correlation and multi-scale pyramid search. The results are shown below.
+        </p>
+    </section>
+    <section>
+        <h2>Gallery</h2>
+        <div class="gallery">
+            <div class="img-card">
+                <img src="../imgout/cathedral.jpg" alt="cathedral.jpg">
+                <div class="displacement">
+                    cathedral.jpg:<br>
+                    R: (10, 3)<br>
+                    G: (5, 2)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/church.tif" alt="church.tif">
+                <div class="displacement">
+                    church.tif:<br>
+                    R: (59, -4)<br>
+                    G: (25, 4)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/emir.tif" alt="emir.tif">
+                <div class="displacement">
+                    emir.tif:<br>
+                    R: (105, 42)<br>
+                    G: (50, 23)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/harvesters.tif" alt="harvesters.tif">
+                <div class="displacement">
+                    harvesters.tif:<br>
+                    R: (123, 13)<br>
+                    G: (59, 17)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/icon.tif" alt="icon.tif">
+                <div class="displacement">
+                    icon.tif:<br>
+                    R: (89, 23)<br>
+                    G: (40, 18)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/italil.tif" alt="italil.tif">
+                <div class="displacement">
+                    italil.tif:<br>
+                    R: (77, 35)<br>
+                    G: (38, 21)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/lastochikino.tif" alt="lastochikino.tif">
+                <div class="displacement">
+                    lastochikino.tif:<br>
+                    R: (76, -9)<br>
+                    G: (-3, -2)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/lugano.tif" alt="lugano.tif">
+                <div class="displacement">
+                    lugano.tif:<br>
+                    R: (93, -29)<br>
+                    G: (41, -16)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/melons.tif" alt="melons.tif">
+                <div class="displacement">
+                    melons.tif:<br>
+                    R: (180, 12)<br>
+                    G: (85, 11)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/monastery.jpg" alt="monastery.jpg">
+                <div class="displacement">
+                    monastery.jpg:<br>
+                    R: (3, 2)<br>
+                    G: (-3, 2)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/self_portrait.tif" alt="self_portrait.tif">
+                <div class="displacement">
+                    self_portrait.tif:<br>
+                    R: (179, 38)<br>
+                    G: (81, 30)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/siren.tif" alt="siren.tif">
+                <div class="displacement">
+                    siren.tif:<br>
+                    R: (96, -25)<br>
+                    G: (50, -6)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/three_generations.tif" alt="three_generations.tif">
+                <div class="displacement">
+                    three_generations.tif:<br>
+                    R: (113, 10)<br>
+                    G: (55, 14)
+                </div>
+            </div>
+            <div class="img-card">
+                <img src="../imgout/tobolsk.jpg" alt="tobolsk.jpg">
+                <div class="displacement">
+                    tobolsk.jpg:<br>
+                    R: (7, 3)<br>
+                    G: (3, 3)
+                </div>
+            </div>
