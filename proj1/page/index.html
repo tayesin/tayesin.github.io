@@ -17,11 +17,42 @@
     <section>
         <h2>Overview</h2>
         <p>
-            This project implements automatic alignment of color channels from historical images using normalized cross-correlation and multi-scale pyramid search. The results are shown below.
+            In this project, I implemented an algorithm to align images taken by the 
+            late Russian photographer Sergei Mikhailovich Prokudin-Gorskii. Each scene
+            was recorded as three separate black-and-white photographs using red, green, and blue
+            filters. In order to colorize the images, I needed to align the three channels
+            correctly. I used normalized cross-correlation (NCC) as my metric
+            to find the best alignment by searching over a window of possible displacements.
+            The final results are shown in the gallery below, along with the computed displacements
+            for the red and green channels relative to the blue channel.
         </p>
     </section>
+       <section>
+        <h2>Methodology</h2>
+        <p>
+            First, I split each input image into its three color channels and try to align the
+            red and green channels to the blue channel. After aligning the images, they're then stacked
+            together to form the final color image.
+        </p>
+        <p>
+            For the simple jpg files, I just do an exhaustive search over a window of possible
+            displacements (from -15 to +15 pixels in both x and y directions). By default, I also have a 
+            local average normalization step to reduce the effect of lighting variations. Essentially, the image
+            is blurred with a box filter and then each pixel is divided by the local average.
+        </p>
+        <p>
+            For the larger tiff files, I implemented a Gaussian pyramid approach to speed up the alignment.
+            The image is repeatedly downsampled by a factor of 2 until the smallest dimension is less than 100 pixels.
+            Then, I perform the exhaustive search on the smallest image with a small search window (from -15 to +15 pixels).
+            The resulting displacement is then scaled up by a factor of 2 and used as the center of a new search window
+            but for for a window of -5 to +5 pixels on the next larger image. This process is repeated until reaching the original image size.
+            This approach significantly reduces the number of NCC computations needed, speeding up the alignment for large images.
+        </p>    
+        <p>
+            Below are the final results of the alignment along with the computed displacements. Enjoy!
+    </section> 
     <section>
-        <h2>Gallery (media/)</h2>
+        <h2>Gallery</h2>
         <div class="gallery">
             <div class="gallery">
                 <div class="img-card">
