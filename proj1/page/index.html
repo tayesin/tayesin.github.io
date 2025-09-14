@@ -31,14 +31,16 @@
         <h2>Methodology</h2>
         <p>
             First, I split each input image into its three color channels and try to align the
-            red and green channels to the blue channel. After aligning the images, they're then stacked
-            together to form the final color image.
+            red and green channels to the blue channel. The images are first cropped by 15% both horizontally and vertically and then 
+            are aligned using two different methods depending on the image format. 
+            After aligning the images, they're then stacked together to form the final color image.
         </p>
         <p>
             For the simple jpg files, I just do an exhaustive search over a window of possible
             displacements (from -15 to +15 pixels in both x and y directions). By default, I also have a 
             local average normalization step to reduce the effect of lighting variations. Essentially, the image
-            is blurred with a box filter and then each pixel is divided by the local average.
+            is blurred with a box filter and then each pixel is divided by the local average. This 
+            helped improve the alignment for particular images like emir.tif and church.tif.
         </p>
         <p>
             For the larger tiff files, I implemented a Gaussian pyramid approach to speed up the alignment.
@@ -49,7 +51,8 @@
             This approach significantly reduces the number of NCC computations needed, speeding up the alignment for large images.
         </p>    
         <p>
-            Below are the final results of the alignment along with the computed displacements. Enjoy!
+            Below are the final results of the alignment along with the computed displacements. The last three are 
+            personally chosen photos from Prokudin-Gorskii's collection. Enjoy!
     </section> 
     <section>
         <h2>Gallery</h2>
@@ -165,6 +168,30 @@
                     <div class="displacement">
                         R: (7, 3)<br>
                         G: (3, 3)
+                    </div>
+                </div>
+                <div class="img-card">
+                    <img src="../media/urals.jpg" alt="urals.jpg">
+                    <div class="filename">urals.tif</div>
+                    <div class="displacement">
+                        R: (94, 59)<br>
+                        G: (39, 33)
+                    </div>
+                </div>
+                <div class="img-card">
+                    <img src="../media/woman.jpg" alt="woman.jpg">
+                    <div class="filename">woman.tif</div>
+                    <div class="displacement">
+                        R: (106, 56)<br>
+                        G: (47, 38)
+                    </div>
+                </div>
+                <div class="img-card">
+                    <img src="../media/zakat.jpg" alt="zakat.jpg">
+                    <div class="filename">zakat.tif</div>
+                    <div class="displacement">
+                        R: (114, -68)<br>
+                        G: (75, -41)
                     </div>
                 </div>
             </div>
