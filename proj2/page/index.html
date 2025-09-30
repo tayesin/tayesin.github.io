@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CS180/CS280A Project 2: Fun with Filters & Frequencies</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; color:#222; }
+    h1, h2 { color: #333; }
+    h3 { color:#444; margin-top:1.5em; }
+    p { max-width: 1000px; }
+    .gallery { display: flex; flex-wrap: wrap; gap: 1.5em; }
+    .img-card { background:#fff; border:1px solid #ddd; border-radius:8px; padding:1em; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+    .img-card img { max-width:100%; border-radius:4px; display:block; }
+    .filename { font-size:0.95em; color:#555; margin-top:0.5em; }
+    .note { color:#666; font-size:0.95em; }
+    pre { background:#fff; border:1px solid #ddd; border-radius:8px; padding:1em; overflow:auto; box-shadow:0 2px 6px rgba(0,0,0,0.04); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    table { border-collapse: collapse; background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+    th, td { padding:10px 12px; border-bottom:1px solid #eee; text-align:left; }
+    th { background:#fafafa; }
+    tr:last-child td { border-bottom:0; }
+    hr { border:0; height:1px; background:#e7e7e7; margin:2em 0; }
+    .section { margin-bottom: 2em; }
+    
+    .figure-wide {
+    max-width: 1000px;
+    margin: 1.5em auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1em;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .figure-wide img { width: 100%; height: auto; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <h1>CS180/CS280A Project 2: Fun with Filters & Frequencies</h1>
+
+  <section class="section">
+    <h2>Overview</h2>
+    <p>
+      This project explores 2D convolution and frequency-based processing. In Part 1, I implement
+      convolution from scratch and use finite differences and derivative-of-Gaussian (DoG) filters
+      for edge detection. In Part 2, I apply frequency ideas to unsharp masking (sharpening),
+      hybrid images (mixing low/high frequency content), and multi-resolution blending with
+      Gaussian/Laplacian stacks (the “oraple”).
+    </p>
+  </section>
+
+  <hr>
+
+  <!-- ===================== PART 1 ===================== -->
+  <section id="part1" class="section">
+    <h2>Part 1: Fun with Filters</h2>
+
+    <h3 id="p11">1.1 Convolutions from Scratch</h3>
+    <p>
+      I implemented 2D convolution with (a) four loops, then (b) two loops using region sums,
+      and compared against <code>scipy.signal.convolve2d</code>. I used zero padding (fill = 0).
+      Below are my results on a grayscale selfie with a 9×9 box filter and finite differences.
+    </p>
+
+    <pre><code># 4 for loops
+def convolve_4(img, kernel):
+    img32 = img.astype(np.float32)
+    r = kernel.shape[0] // 2
+    c = kernel.shape[1] // 2
+    img_pad = np.pad(img32, ((r, r), (c, c)), mode='constant', constant_values=0)
+    k = kernel[::-1, ::-1].astype(np.float32)
+
+    result = np.zeros_like(img32)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            acc = 0.0
+            for ki in range(-r, r + 1):
+                for kj in range(-c, c + 1):
+                    acc += img_pad[i + r + ki, j + c + kj] * k[ki + r, kj + c]
+            result[i, j] = acc
+    return result
+</code></pre>
+
+    <pre><code># 2 for loops
+def convolve_2(img, kernel):
+    img32 = img.astype(np.float32)
+    r = kernel.shape[0] // 2
+    c = kernel.shape[1] // 2
+    img_pad = np.pad(img32, ((r, r), (c, c)), mode='constant', constant_values=0)
+    k = kernel[::-1, ::-1].astype(np.float32)
+
+    result = np.zeros_like(img32)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            region = img_pad[i:i + 2 * r + 1, j:j + 2 * c + 1]
+            result[i, j] = np.sum(region * k)
+    return result
+</code></pre>
+
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/1.1/selfie_gray.jpg" alt="selfie gray">
+        <div class="filename">Selfie (grayscale)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.1/selfie_filtered.jpg" alt="selfie box">
+        <div class="filename">9×9 box filter</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.1/selfie_dx.jpg" alt="selfie dx">
+        <div class="filename">Finite differences (Dx)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.1/selfie_dy.jpg" alt="selfie dy">
+        <div class="filename">Finite differences (Dy)</div>
+      </div>
+    </div>
+
+    <p class="note">Notes: include runtime comparison vs SciPy and a short comment on boundary handling.</p>
+
+    <h3 id="p12">1.2 Finite Difference Operator</h3>
+    <p>
+      Using <code>D<sub>x</sub> = [1, 0, -1]</code> and <code>D<sub>y</sub> = [1, 0, -1]^T</code>,
+      I show the partial derivatives, gradient magnitude, and a binarized edge map
+      (threshold chosen qualitatively to suppress noise while retaining edges).
+    </p>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/1.2/cameraman.png" alt="cameraman">
+        <div class="filename">Cameraman original image</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.2/cameraman_dx.jpg" alt="Dx">
+        <div class="filename">∂I/∂x (cameraman)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.2/cameraman_dy.jpg" alt="Dy">
+        <div class="filename">∂I/∂y (cameraman)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.2/cameraman_gradient_magnitude.jpg" alt="gradmag">
+        <div class="filename">Gradient magnitude</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.2/cameraman_edges.jpg" alt="edges">
+        <div class="filename">Binarized edges (τ = 0.2)</div>
+      </div>
+    </div>
+
+    <h3 id="p13">1.3 Derivative of Gaussian (DoG)</h3>
+    <p>
+      I blur the image with a Gaussian (constructed using <code>cv2.getGaussianKernel</code> and
+      an outer product) and repeat the edge detection. Then I create DoG filters by convolving
+      the Gaussian with Dx/Dy and verify the results match a two-step blur-then-difference.
+
+      Threshold 0.08
+    </p>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/1.3/cameraman_gaussian_blurred.jpg" alt="blur">
+        <div class="filename">Gaussian-blurred image</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.3/cameraman_binarized.jpg" alt="binarized">
+        <div class="filename">Gaussian binarized image</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.3/cameraman_gaussian_dx.jpg" alt="dx">
+        <div class="filename">Dx of blurred image</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.3/cameraman_gaussian_dy.jpg" alt="dy">
+        <div class="filename">Dy of blurred image</div>
+      </div>
+    </div>
+
+    <p>
+        Here I verify the DoG filters match a two-step blur-then-difference.
+    </p>
+
+        <div class="gallery">
+      <div class="img-card">
+        <img src="../media/1.3/dogx.jpg" alt="dogx" style="width:100%;height:auto;">
+        <div class="filename">DoG x</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.3/dogy.jpg" alt="dogy" style="width:100%;height:auto;">
+        <div class="filename">DoG y</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/1.3/dog_binarized.jpg" alt="binarized">
+        <div class="filename">Binarized after one convolution</div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ===================== PART 2 ===================== -->
+  <section id="part2" class="section">
+    <h2>Part 2: Fun with Frequencies</h2>
+
+    <h3 id="p21">2.1 Image “Sharpening” (Unsharp Mask)</h3>
+    <p>
+      Unsharp mask adds high frequencies: <code>sharp = img + α(img - blur(G))</code>.
+      I show results on the Taj image and another image. I also blur a sharp image and try to re-sharpen it,
+      comparing the recovered version to the original. Using a 15x15 kernel and sigma of 3.
+    </p>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.1/taj.jpg" alt="taj orig">
+        <div class="filename">Taj original</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.1/taj_sharpened.jpg" alt="taj highfreq">
+        <div class="filename">High-frequency component</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.1/taj_sharpened_full.jpg" alt="taj sharp">
+        <div class="filename">Sharpened (α=1 example)</div>
+      </div>
+    </div>
+
+    <p>
+      We can use just one convolution to sharpen the image which is called the unsharp mask filter. Below is the code for how I did it.
+    </p>
+
+    <pre>
+    <code>
+    alpha = 3.0
+    H = -alpha * k
+    H[k.shape[0]//2, k.shape[1]//2] += (1 + alpha)
+
+    trump_sharpened = np.dstack([
+        signal.convolve2d(trump[..., c], H, mode='same', boundary='symm')
+        for c in range(3)
+    ])
+    </code>
+    </pre>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.1/taj_single_sharpened.jpg" alt="taj orig">
+        <div class="filename">Sharpened in one convolution</div>
+      </div>
+    </div>
+
+    <p>
+        For my own example I have a blurry image of Trump which I try to sharpen.
+    </p>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.1/trump.jpg" alt="trump orig">
+        <div class="filename">Trump original</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.1/trump_hf.jpg" alt="trump high frequencies">
+        <div class="filename">Trump high frequencies</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.1/trump_sharpened.jpg" alt="trump sharpened">
+        <div class="filename">Trump sharpened</div>
+      </div>
+    </div>
+
+    <p>
+        We can also try to return a blurred image back to its original form by sharpening it.
+        Here, I blur a photo of a cat but I attempt to turn it back to it's original form by sharpening the blurred image.
+        We can see that while it gets close, it isn't as sharp as the original.
+    </p>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.1/cat.jpg" alt="cat orig">
+        <div class="filename">Cat original</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.1/cat_blurred.jpg" alt="cat blurred">
+        <div class="filename">Cat blurred</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.1/cat_sharpened.jpg" alt="cat sharpened">
+        <div class="filename">Cat sharpened from blurred</div>
+      </div>
+    </div>
+
+
+    <h3 id="p22">2.2 Hybrid Images</h3>
+    <p>
+      I create hybrid images by low-pass filtering A, high-pass filtering B, and adding them.
+      For my favorite example, I include FFT visualizations of inputs, filtered images, and the hybrid.
+    </p>
+
+    <p>
+        There are two examples. One is a hybrid image of the late Queen Elizabeth and rapper XXXTentacion using a sigma of 8 and kernel size of 45.The other
+        is a hybrid image of Presidents Trump and Biden using a low pass sigma of 5, a high pass sigma of 8, and kernel size of 45. I include the FFT for the Queen and X hybrid image.
+    </p>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.2/queen_aligned.jpg" alt="A original">
+        <div class="filename">Image A original</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/x_aligned.jpg" alt="B original">
+        <div class="filename">Image B original</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/lp.jpg" alt="A low">
+        <div class="filename">Image A (low-pass)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/hp.jpg" alt="B high">
+        <div class="filename">Image B (high-pass)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/hyb.jpg" alt="hybrid">
+        <div class="filename">Hybrid result</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/fft_queen.jpg" alt="FFT A">
+        <div class="filename">FFT (A)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/fft_x.jpg" alt="FFT B">
+        <div class="filename">FFT (B)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/fft_lp.jpg" alt="FFT lp">
+        <div class="filename">FFT low pass</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/fft_hp.jpg" alt="FFT hp">
+        <div class="filename">FFT high pass</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/fft_hyb.jpg" alt="FFT hybrid">
+        <div class="filename">FFT (Hybrid)</div>
+      </div>
+    </div>
+
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.2/pres_lp.jpg" alt="A low pass">
+        <div class="filename">Image A low pass</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/pres_hp.jpg" alt="B high pass">
+        <div class="filename">Image B high pass</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.2/pres_hyb.jpg" alt="Hybrid">
+        <div class="filename">Hybrid image of Trump and Biden</div>
+      </div>
+    </div>
+
+    <h3 id="p23">2.3 Gaussian & Laplacian Stacks</h3>
+    <p>
+      I implement Gaussian and Laplacian stacks from scratch.
+      Below are stack visualizations for the apple+orange pair to mimic Szelski Fig. 3.42.
+    </p>
+
+    <div class="figure-wide">
+        <img src="../media/2.3/lp_stack.png" alt="gaussian and laplacian stack">
+        <div class="filename">Gaussian and Laplacian stack</div>
+    </div>
+    
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.3/oraple.jpg" alt="oraple">
+        <div class="filename">Oraple</div>
+      </div>
+    </div>
+
+    <h3 id="p24">2.4 Multiresolution Blending (the Oraple)</h3>
+    <p>
+      Below are the Laplacian and Gaussian stacks for the oraple along with a blended image of my own.
+      I chose to blend a photo of hongkong taken in the day and another taken in the night.
+    </p>
+
+
+    <figure class="figure-wide">
+        <img src="../media/2.4/oraple_stacks.png" alt="Oraple stacks">
+        <figcaption class="filename">Oraple Gaussian and Laplacian Stacks</figcaption>
+    </figure>
+
+    
+    <div class="gallery">
+      <div class="img-card">
+        <img src="../media/2.4/hongkong_day.jpg" alt="day">
+        <div class="filename">Right/Orange (masked)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.4/hongkong_night.jpg" alt="night">
+        <div class="filename">Right/Orange (masked)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.4/mask.jpg" alt="right">
+        <div class="filename">Right/Orange (masked)</div>
+      </div>
+      <div class="img-card">
+        <img src="../media/2.4/hongkong_blended.jpg" alt="blended">
+        <div class="filename">Right/Orange (masked)</div>
+      </div>
+    </div>
+
+  </section>
+
+  <hr>
+
+  </body>
+</html>
